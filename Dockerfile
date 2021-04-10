@@ -1,15 +1,10 @@
-FROM python:3.8
-
+FROM python:3.7-slim
+COPY . /app
 WORKDIR /app
-
-COPY requirements.txt ./requirements.txt
-
-RUN pip3 install -r requirements.txt
-
-EXPOSE 8501
-
-COPY src/main.py /src/main.py
-
+RUN pip install -r requirements.txt
+EXPOSE 80
+RUN mkdir ~/.streamlit
+RUN cp config.toml ~/.streamlit/config.toml
+WORKDIR /app
 ENTRYPOINT ["streamlit", "run"]
-
-CMD ["/src/main.py"]
+CMD ["app.py"]
