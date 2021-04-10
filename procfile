@@ -1,1 +1,0 @@
-web: streamlit run --server.enableCORS false -p 80:80 app
