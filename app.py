@@ -1,8 +1,11 @@
 import streamlit as st
-import src.main as main
+from streamlit import config
+import src.IQCCD as main
 import src.home as intro
 import src.ccapp as ccapp
-PAGES={'intro':intro, 'IBM Quantum Creative Challenge(docs)':main,'IBM Quantum Creative Challenge(app)':ccapp}
+import src.tcapp as tcapp
+import src.IQTCD as techdoc
+PAGES={'About US':intro, 'IBM Quantum Creative Challenge(app)':ccapp, 'IBM Quantum Creative Challenge(docs)':main,'IBM Quantum Technical Challenge(app)':tcapp, 'IBM Quantum Technical Challenge(docs)':techdoc}
 def write_page(page):  # pylint: disable=redefined-outer-name
     return page.write()
 def main():
