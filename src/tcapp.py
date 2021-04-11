@@ -16,10 +16,9 @@ import qiskit.pulse as pulse
 import qiskit.pulse.library as pulse_lib
 from qiskit.compiler import assemble
 #from qiskit.pulse.library import SamplePulse
-import sys, os
-token = os.environ["INPUT_TOKEN"]
+
 from qiskit import IBMQ 
-IBMQ.save_account(token)
+IBMQ.save_account('fcf339f4cff1a12f732dc9c657d17d8fff91fe6bede0def5884baa697a58074b6fedb6d9d76f7e070f122272e47b01867a9a260d189a32bdea47b098b0a52b90')
 IBMQ.load_account() 
 provider = IBMQ.get_provider(hub="ibm-q", group="open", project="main") 
 backend = provider.get_backend("ibmq_armonk") 

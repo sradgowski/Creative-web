@@ -6,15 +6,53 @@ import pandas as pd
 def write():
     st.title('IBM Quantum Creative Challenge')
     st.subheader('Using interference to create a steganography protocol')
-    st.title('Idea')
-    st.write('Generate Key using a QRNG, . We can use BB84 protocol for the communication channel. But the main challenge here is the stega encoder and cover data')
-    st.write('Steganography is a technique hiding secret information within innocent-looking information')
-    st.markdown(
-        '''## Steganography
-Quantum steganography is the art of secretly transmitting quantum information while disguising the fact that any secret communication is taking place. Like classical steganography, this involves embedding the hidden communication within a seemingly innocent “covertext,” which in the quantum case is a quantum state. [1].
+    st.markdown(''' 
+    # Quantum Steganography
 
-## REFERENCES
-[1] - https://www.sciencedirect.com/science/article/pii/B9780128194386000190''')
+We are **Team QPower** and this project was made as part of IBM's Creative challenge at QC Hack 2021.
+
+
+## Project Idea
+
+We have implemented Quantum Steganography using qiskit in this project. 
+''')
+    st.image("src/qstega.png")  
+    st.markdown('''
+The idea is to encode the sender's text(secret message) using the concept of interference. The secret message is encoded based on the cover file(a text sentence in this case). An interactive working implementation is available here: [https://qc-hacks.herokuapp.com/](https://qc-hacks.herokuapp.com/). 
+
+We have chosen our cover file and the secret message to be in text formats to make it easier for new learners to understand the concept of quantum steganography while also trying it out interactively in a console. 
+
+## Implementation Details
+
+The encoder circuit is based on 7 qubits but our interactive application has an option to create circuits based on the number of qubits selected and view them instantaneously.  
+
+Here are some steps to interactively play with our application:
+
+1. Choose the number of qubits using the slider. We would suggest that you choose 7 for the encoding and decoding scheme to work flawlessly. You can also test out other number of qubits to view the generated circuit.  
+    ''')
+    st.image("src/images/no_of_qubits.png")
+    st.markdown('''
+2. Enter the Secret message and press enter. You could try out *qiskit* as one of the test words.  
+''')
+    st.image("src/images/secret_msg.png")
+    st.markdown('''
+Here, you can also view the generated circuit.
+
+3. Upload a sentence where you wish to hide your message and press enter. You could try this sentence *hellooo worlddd hellooo worlddd hellooo worlddd*, a bit too dramatic to be a sentence, but it works. We are fixing our backend to support all sentence types.   
+In this image, I have used *Sophisticated Superconductors* as the short sentence and it works.  
+''')
+    st.image("src/images/upload_sentence.png")
+    st.markdown('''
+4. Click of encode to view the encoded message and then click on decode to finally view your original message.  
+''')
+    st.image("src/images/encoded_msg.png")
+    st.image("src/images/decode.png")
+    st.markdown(
+        '''
+You can now play around with this tool and chat with your friends using **Quantum Steganography**. Isn't it cool?
+
+
+''')
 
 
 
