@@ -4,6 +4,17 @@ import pandas as pd
 
 #streamlit run [filename]
 def write():
-    st.title('StackOverflow 2019 Developer Survey')
-    st.write('(This data only reflects 50 rows for performance purposes)')
-    st.subheader('Use the sidebar to filter the data set by student status. The below charts will auto-generate based on your selections.')
+    st.title('IBM Quantum Creative Challenge')
+    st.subheader('Using interference to create a steganography protocol')
+    st.title('Idea')
+    st.write('Generate Key using a QRNG, . We can use BB84 protocol for the communication channel. But the main challenge here is the stega encoder and cover data')
+    st.write('Steganography is a technique hiding secret information within innocent-looking information')
+    st.markdown(
+        '''## Steganography
+Quantum steganography is the art of secretly transmitting quantum information while disguising the fact that any secret communication is taking place. Like classical steganography, this involves embedding the hidden communication within a seemingly innocent “covertext,” which in the quantum case is a quantum state. [1].
+
+## REFERENCES
+[1] - https://www.sciencedirect.com/science/article/pii/B9780128194386000190''')
+
+
+
