@@ -5,3 +5,6 @@ numpy
 seaborn
 matplotlib
 python-dateutil
+docx2txt
+matplotlib
+pdfplumber
