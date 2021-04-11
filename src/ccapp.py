@@ -4,7 +4,7 @@ import pandas as pd
 import docx2txt
 import pdfplumber
 import numpy as np
-
+from qiskit import *
 # importing Qiskit
 from qiskit import IBMQ, BasicAer
 # from qiskit.providers.ibmq import least_busy
@@ -78,7 +78,7 @@ def wordToBV(s, n) :
     
     return circuit_array
 
-def encrypt(BB84_key='0001011', letter=''):
+def encrypt(BB84_key, letter):
     """Calculates XOR"""
     b = int(BB84_key, 2)
     x = ord(letter)
@@ -110,7 +110,7 @@ def stega_encoder(LM, carrier_msg):
     return message
 
 
-def stega_decoder(new_carrier_msg, BB84_key='0001011'):
+def stega_decoder(new_carrier_msg, BB84_key):
     """Decodes secret message from new_carrier_msg"""
 
     b = int(BB84_key, 2)
@@ -130,50 +130,78 @@ def stega_decoder(new_carrier_msg, BB84_key='0001011'):
             bitstring = ""
 
     return message
+def sifted_key(A_basis,B_basis,key): 
+ correct_basis=[]
+ sifted_key=''
+
+ for i in range(len(A_basis)):
+  if A_basis[i]==B_basis[i]:
+    correct_basis.append(i)
+    sifted_key+=key[i]
+  else:
+    pass 
+ return sifted_key,correct_basis
 
 
 def write():
     text = ""
     menu = ["Home","Dataset","DocumentFiles","About"]
     choice = st.sidebar.selectbox("Menu",menu)
-    st.header('Upload a file where you wish to hide your message ')
-    docx_file = st.file_uploader("",type=['txt','docx','pdf'])
-    if st.button("Process"):
-        if docx_file is not None:
-            file_details = {"Filename":docx_file.name,"FileType":docx_file.type,"FileSize":docx_file.size}
-            st.write(file_details)
-			# Check File Type
-            if docx_file.type == "text/plain":
-				# raw_text = docx_file.read() # read as bytes
-				# st.write(raw_text)
-				# st.text(raw_text) # fails
-                st.text(str(docx_file.read(),"utf-8")) # empty
-                raw_text = str(docx_file.read(),"utf-8") # works with st.text and st.write,used for futher processing
-				# st.text(raw_text) # Works
-                st.write(raw_text) # works
-            elif docx_file.type == "application/pdf":
-				# raw_text = read_pdf(docx_file)
-                # st.write(raw_text)
-                try:
-                    with pdfplumber.open(docx_file) as pdf:
-                        page = pdf.pages[0]
-                        text = (page.extract_text())
-                        st.write(text)
-                except:
-                        st.write("None")
-					    
-					
-            elif docx_file.type == "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
-				# Use the right file processor ( Docx,Docx2Text,etc)
-                raw_text = docx2txt.process(docx_file) # Parse in the uploadFile Class directory
-                st.write(raw_text)
-    print(text)
-    st.header('Set the number of Qubits')
-    qubits = st.slider('number of qubits', min_value=1, max_value=10)
+    
+    st.header('Set the number of Qubits ')
+    qubits = st.slider('please choose 7 for the time being', min_value=1, max_value=10)
+    qr = QuantumRegister(qubits, name='qr')
+    cr = ClassicalRegister(qubits, name='cr')    
+    qc = QuantumCircuit(qr, cr, name='QC')
+
+    # BB84 Protocol :
+    # Generate a random number in the range of available qubits [0,65536))
+    alice_key = np.random.randint(0,2**qubits)#here we can remplace by a key from a quantum key generator
+
+
+    alice_key = np.binary_repr(alice_key,qubits) 
+    for i in range(len(alice_key)):
+        if alice_key[i]=='1':
+            qc.x(qr[i])
+    B=[]
+    for i in range(len(alice_key)):
+
+        if 0.5 < np.random.random():
+            qc.h(qr[i])
+            B.append("H")
+        else:
+            B.append("S")
+            pass
+    
+    qc.barrier()  
+    print("Alice Basis",B)
+    C=[]
+    for i in range(len(alice_key)):
+        if 0.5 < np.random.random():
+            qc.h(qr[i])
+            C.append("H")
+            
+        else:
+            C.append("S")
+        qc.barrier()
+        for i in range(len(alice_key)):
+            qc.measure(qr[i],cr[i])
+            print("Bob Basis",C)
+    simulator = Aer.get_backend('qasm_simulator')
+    execute(qc, backend = simulator)
+    result = execute(qc, backend = simulator).result()
+    print("Bob key :",list(result.get_counts(qc))[0])
+    print("Bob Basis",C)
+
+    print("Alice key :",alice_key)
+    print("Alice Basis :",B)
+    a=sifted_key(B,C,alice_key)
+    BB84_key=a[0]
+
     st.header('Secret Message')
-    message = st.text_input('')
+    message = st.text_input('let the message be qiskit')
     if message:
-        circuit_to_run = wordToBV('Qiskit',qubits)#Secret Msg
+        circuit_to_run = wordToBV(message,qubits)#Secret Msg
         st.write(circuit_to_run[0].draw(output='mpl'))
         backend = BasicAer.get_backend('qasm_simulator')
         shots = 4096
@@ -181,3 +209,19 @@ def write():
         answer = results.get_counts()
         st.write(answer)
         st.write(plot_histogram(answer))
+    encrypt(BB84_key,'q')
+    st.header('Upload a sentence where you wish to hide your message ')
+    st.write('')
+    text_ob = st.text_input('let the sentence be hellooo worlddd  hellooo worlddd hellooo worlddd')
+    if text_ob:
+        L=[]
+        for c in message:
+            L.append(encrypt(BB84_key,c))
+            new_carrier_msg=stega_encoder(L, text_ob)
+        new_carrier_msg=stega_encoder(L, text_ob )
+        st.header('Encoded message')
+        if st.button('Encode'):
+            st.write(new_carrier_msg)
+        st.header('Decoded Message')
+        if st.button('Decode'):
+            st.write(stega_decoder(new_carrier_msg, BB84_key))
