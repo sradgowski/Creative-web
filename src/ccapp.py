@@ -14,7 +14,6 @@ from qiskit import QuantumCircuit, ClassicalRegister, QuantumRegister, execute
 # import basic plot tools
 from qiskit.visualization import plot_histogram
 
-qubiuts = 7
 def wordToBV(s, n) :
     #convert text to binary
     a_byte_array = bytearray(s, "utf8")
@@ -79,15 +78,66 @@ def wordToBV(s, n) :
     
     return circuit_array
 
+def encrypt(BB84_key='0001011', letter=''):
+    """Calculates XOR"""
+    b = int(BB84_key, 2)
+    x = ord(letter)
+    return format(b ^ x, "b")
 
 
+def stega_encoder(LM, carrier_msg):
+    """Encodes LM bits message into carrier_msg"""
+    message = ""
+    size = len(LM[0])
+    i = 0
+    for j, bitstring in enumerate(LM):
+        for k, digit in enumerate(bitstring):
+            while (not carrier_msg[i].isalpha()):
+                message += carrier_msg[i]
+                i += 1
 
-#streamlit run [filename]
+            if digit == "1":
+                letter = carrier_msg[i].upper()
+                message += letter
+            else:
+                message += carrier_msg[i]
+
+            i += 1
+    
+    if i < len(carrier_msg):
+        message += carrier_msg[i:]
+
+    return message
+
+
+def stega_decoder(new_carrier_msg, BB84_key='0001011'):
+    """Decodes secret message from new_carrier_msg"""
+
+    b = int(BB84_key, 2)
+
+    message = ""
+    bitstring = ""
+    for char in new_carrier_msg:
+        if char.isalpha():
+            if char.isupper():
+                bitstring += "1"
+            else:
+                bitstring += "0"
+
+        if len(bitstring) == 7:
+            x = int(bitstring, 2)
+            message += chr(b ^ x)
+            bitstring = ""
+
+    return message
+
+
 def write():
     text = ""
     menu = ["Home","Dataset","DocumentFiles","About"]
     choice = st.sidebar.selectbox("Menu",menu)
-    docx_file = st.file_uploader("Upload File",type=['txt','docx','pdf'])
+    st.header('Upload a file where you wish to hide your message ')
+    docx_file = st.file_uploader("",type=['txt','docx','pdf'])
     if st.button("Process"):
         if docx_file is not None:
             file_details = {"Filename":docx_file.name,"FileType":docx_file.type,"FileSize":docx_file.size}
@@ -118,11 +168,16 @@ def write():
                 raw_text = docx2txt.process(docx_file) # Parse in the uploadFile Class directory
                 st.write(raw_text)
     print(text)
-    circuit_to_run = wordToBV('Qiskit',qubiuts)#Secret Msg
-    st.write(circuit_to_run[0].draw(output='mpl'))
-    backend = BasicAer.get_backend('qasm_simulator')
-    shots = 4096
-    results = execute(circuit_to_run[::-1], backend=backend, shots=shots).result()
-    answer = results.get_counts()
-
-    st.write(plot_histogram(answer))
+    st.header('Set the number of Qubits')
+    qubits = st.slider('number of qubits', min_value=1, max_value=10)
+    st.header('Secret Message')
+    message = st.text_input('')
+    if message:
+        circuit_to_run = wordToBV('Qiskit',qubits)#Secret Msg
+        st.write(circuit_to_run[0].draw(output='mpl'))
+        backend = BasicAer.get_backend('qasm_simulator')
+        shots = 4096
+        results = execute(circuit_to_run[::-1], backend=backend, shots=shots).result()
+        answer = results.get_counts()
+        st.write(answer)
+        st.write(plot_histogram(answer))
