@@ -4,6 +4,7 @@ pandas
 numpy
 seaborn
 matplotlib
+pylatexenc
 python-dateutil
 docx2txt
 matplotlib
