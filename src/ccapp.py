@@ -11,6 +11,7 @@ from qiskit import IBMQ, BasicAer
 from qiskit.providers.ibmq import *
 from qiskit import QuantumCircuit, ClassicalRegister, QuantumRegister, execute
 
+
 # import basic plot tools
 from qiskit.visualization import plot_histogram
 
@@ -80,6 +81,8 @@ def wordToBV(s, n) :
 
 def encrypt(BB84_key, letter):
     """Calculates XOR"""
+    if BB84_key is "":
+        BB84_key="0000"
     b = int(BB84_key, 2)
     x = ord(letter)
     return format(b ^ x, "b")
